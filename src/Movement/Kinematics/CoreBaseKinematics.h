@@ -25,7 +25,7 @@ protected:
 	// The default implementation just returns directionVector[drive] but this needs to be overridden for CoreXY and CoreXZ printers.
 	virtual float MotorFactor(size_t drive, const float directionVector[]) const = 0;
 
-	float axisFactors[CART_AXES];
+	float axisFactors[MAX_AXES];
 };
 
 #endif /* SRC_MOVEMENT_KINEMATICS_COREBASEKINEMATICS_H_ */

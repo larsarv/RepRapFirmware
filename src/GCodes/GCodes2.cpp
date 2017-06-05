@@ -3406,7 +3406,67 @@ bool GCodes::HandleMcode(GCodeBuffer& gb, StringRef& reply)
 			}
 		}
 		break;
+	case 668:
+		if (!LockMovementAndWaitForStandstill(gb))
+		{
+			return false;
+		}
+		{
+			Move& move = reprap.GetMove();
+			float positionNow[DRIVES];
+			move.GetCurrentUserPosition(positionNow, 0, reprap.GetCurrentXAxes());		// get the current position, we may need it later
+			const KinematicsType oldK = move.GetKinematics().GetKinematicsType();		// get the current kinematics type so we can tell whether it changed
 
+			bool seen = false;
+			bool changedToCartesian = false;
+			if (gb.Seen('S'))
+			{
+				// Switch to the correct CoreXY mode
+				const int mode = gb.GetIValue();
+				switch (mode)
+				{
+				case 0:
+					move.SetKinematics(KinematicsType::cartesian);
+					changedToCartesian = true;
+					break;
+
+				case 1:
+					if (numAxes < 5) {
+						platform.MessageF(GENERIC_MESSAGE, "Error: U and V axis must be defined using M584 before M668 command\n", mode);
+						error = true;
+						return true;
+					}
+					move.SetKinematics(KinematicsType::coreXYU);
+					break;
+
+				default:
+					platform.MessageF(GENERIC_MESSAGE, "Error: mode %d is not value in M668 command\n", mode);
+					error = true;
+					return true;
+				}
+				seen = true;
+			}
+
+			if (!changedToCartesian)		// don't ask the kinematics to process M667 if we switched to Cartesian mode
+			{
+				if (move.GetKinematics().SetOrReportParameters(668, gb, reply, error))
+				{
+					seen = true;
+				}
+			}
+
+			if (seen)
+			{
+				// We changed something, so reset the positions and set all axes not homed
+				if (move.GetKinematics().GetKinematicsType() != oldK)
+				{
+					move.GetKinematics().GetAssumedInitialPosition(numAxes, positionNow);
+				}
+				SetPositions(positionNow);
+				SetAllAxesNotHomed();
+			}
+		}
+		break;
 	case 669:	// Set kinematics and parameters for SCARA and other kinematics that don't use M665, M666 or M667
 		if (!LockMovementAndWaitForStandstill(gb))
 		{

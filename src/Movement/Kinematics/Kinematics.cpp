@@ -10,6 +10,7 @@
 #include "CartesianKinematics.h"
 #include "CoreXYKinematics.h"
 #include "CoreXZKinematics.h"
+#include "CoreXYUKinematics.h"
 #include "ScaraKinematics.h"
 #include "RepRap.h"
 #include "Platform.h"
@@ -91,6 +92,8 @@ void Kinematics::GetAssumedInitialPosition(size_t numAxes, float positions[]) co
 		return new CoreXZKinematics();
 	case KinematicsType::scara:
 		return new ScaraKinematics();
+	case KinematicsType::coreXYU:
+		return new CoreXYUKinematics();
 	}
 }
 

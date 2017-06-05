@@ -1138,7 +1138,7 @@ void DDA::CheckEndstops(Platform& platform)
 			{
 			case EndStopHit::lowHit:
 				endStopsToCheck &= ~(1 << drive);					// clear this check so that we can check for more
-				if (endStopsToCheck == 0 || reprap.GetMove().IsCoreXYAxis(drive))	// if no more endstops to check, or this axis uses shared motors
+				if (endStopsToCheck == 0 || reprap.GetMove().IsCoreXYAxis(drive) || reprap.GetMove().IsCoreXYUAxis(drive))	// if no more endstops to check, or this axis uses shared motors
 				{
 					MoveAborted();
 				}
@@ -1151,7 +1151,7 @@ void DDA::CheckEndstops(Platform& platform)
 
 			case EndStopHit::highHit:
 				endStopsToCheck &= ~(1 << drive);					// clear this check so that we can check for more
-				if (endStopsToCheck == 0 || reprap.GetMove().IsCoreXYAxis(drive))	// if no more endstops to check, or this axis uses shared motors
+				if (endStopsToCheck == 0 || reprap.GetMove().IsCoreXYAxis(drive) || reprap.GetMove().IsCoreXYUAxis(drive))	// if no more endstops to check, or this axis uses shared motors
 				{
 					MoveAborted();
 				}

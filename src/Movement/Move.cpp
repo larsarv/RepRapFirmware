@@ -868,6 +868,16 @@ void Move::JustHomed(size_t axisHomed, float hitPoint, DDA* hitDDA)
 		tempCoordinates[axisHomed] = hitPoint;
 		hitDDA->SetPositions(tempCoordinates, CART_AXES);
 	}
+	else if (IsCoreXYUAxis(axisHomed))
+	{
+		float tempCoordinates[5];
+		for (size_t axis = 0; axis < 5; ++axis)
+		{
+			tempCoordinates[axis] = hitDDA->GetEndCoordinate(axis, false);
+		}
+		tempCoordinates[axisHomed] = hitPoint;
+		hitDDA->SetPositions(tempCoordinates, 5);
+	}
 	else
 	{
 		hitDDA->SetDriveCoordinate(MotorEndPointToMachine(axisHomed, hitPoint), axisHomed);
@@ -1050,6 +1060,16 @@ bool Move::IsCoreXYAxis(size_t axis) const
 		return axis == X_AXIS || axis == Y_AXIS;
 	case KinematicsType::coreXZ:
 		return axis == X_AXIS || axis == Z_AXIS;
+	default:
+		return false;
+	}
+}
+bool Move::IsCoreXYUAxis(size_t axis) const
+{
+	switch(kinematics->GetKinematicsType())
+	{
+	case KinematicsType::coreXYU:
+		return axis == X_AXIS || axis == Y_AXIS || axis == 3 || axis == 4;
 	default:
 		return false;
 	}

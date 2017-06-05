@@ -7,10 +7,11 @@
 
 #include "CoreBaseKinematics.h"
 #include "GCodes/GCodes.h"
+#include "CoreXYUKinematics.h"
 
 CoreBaseKinematics::CoreBaseKinematics(KinematicsType t) : Kinematics(t)
 {
-	for (size_t axis = 0; axis < CART_AXES; ++axis)
+	for (size_t axis = 0; axis < MAX_AXES; ++axis)
 	{
 		axisFactors[axis] = 1.0;
 	}
@@ -45,6 +46,27 @@ bool CoreBaseKinematics::SetOrReportParameters(unsigned int mCode, GCodeBuffer& 
 		{
 			reply.printf("Printer mode is %s with axis factors", GetName());
 			for (size_t axis = 0; axis < CART_AXES; ++axis)
+			{
+				reply.catf(" %c:%f", GCodes::axisLetters[axis], axisFactors[axis]);
+			}
+		}
+		return seen;
+	}
+	else if (mCode == 668)
+	{
+		bool seen = false;
+		for (size_t axis = 0; axis < COREXYU_AXES; ++axis)
+		{
+			if (gb.Seen(GCodes::axisLetters[axis]))
+			{
+				axisFactors[axis] = gb.GetFValue();
+				seen = true;
+			}
+		}
+		if (!seen && !gb.Seen('S'))
+		{
+			reply.printf("Printer mode is %s with axis factors", GetName(false));
+			for (size_t axis = 0; axis < COREXYU_AXES; ++axis)
 			{
 				reply.catf(" %c:%f", GCodes::axisLetters[axis], axisFactors[axis]);
 			}

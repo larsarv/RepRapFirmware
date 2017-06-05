@@ -20,6 +20,7 @@ enum class KinematicsType : uint8_t
 	coreXZ,
 	linearDelta,
 	scara,
+	coreXYU,
 
 	unknown				// this one must be last!
 };

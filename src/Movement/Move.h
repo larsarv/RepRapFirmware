@@ -79,6 +79,7 @@ public:
 	// Temporary kinematics functions
 	bool IsDeltaMode() const { return kinematics->GetKinematicsType() == KinematicsType::linearDelta; }
 	bool IsCoreXYAxis(size_t axis) const;											// Return true if the specified axis shares its motors with another
+	bool IsCoreXYUAxis(size_t axis) const;											// Return true if the specified axis shares its motors with another
 	// End temporary functions
 
 	void CurrentMoveCompleted();													// Signal that the current move has just been completed
